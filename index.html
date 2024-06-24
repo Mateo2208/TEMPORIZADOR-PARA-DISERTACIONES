@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporizador de disertaciones</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            transition: background-color 0.5s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: auto;
+        }
+        .container div {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        .timer {
+            font-size: 3em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Temporizador para disertaciones</h1>
+        <div>
+            <label for="totalTime">Tiempo total (minutos): </label>
+            <input type="number" id="totalTime" value="30" min="1">
+        </div>
+        <div>
+            <label>Dividir tiempo en: </label>
+            <label><input type="radio" name="division" value="2" checked> 2 secciones</label>
+            <label><input type="radio" name="division" value="3"> 3 secciones</label>
+            <label><input type="radio" name="division" value="4"> 4 secciones</label>
+        </div>
+        <button onclick="startTimer()">Iniciar</button>
+        <div class="timer hidden" id="timerDisplay"></div>
+        <button class="hidden" id="resetButton" onclick="resetTimer()">Reiniciar</button>
+    </div>
+
+    <script>
+        let timer;
+        let totalSeconds;
+        let remainingSeconds;
+
+        function startTimer() {
+            const totalTime = parseInt(document.getElementById('totalTime').value) * 60;
+            const divisions = parseInt(document.querySelector('input[name="division"]:checked').value);
+            totalSeconds = totalTime;
+            remainingSeconds = totalTime;
+
+            document.getElementById('timerDisplay').classList.remove('hidden');
+            document.getElementById('resetButton').classList.remove('hidden');
+            document.querySelector('button[onclick="startTimer()"]').classList.add('hidden');
+            updateBackgroundColor(divisions);
+            updateTimerDisplay();
+
+            timer = setInterval(() => {
+                remainingSeconds--;
+                if (remainingSeconds <= 0) {
+                    clearInterval(timer);
+                    document.body.style.backgroundColor = 'white';
+                    document.getElementById('timerDisplay').textContent = "Tiempo finalizado";
+                } else {
+                    updateBackgroundColor(divisions);
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            document.body.style.backgroundColor = '';
+            document.getElementById('timerDisplay').classList.add('hidden');
+            document.getElementById('resetButton').classList.add('hidden');
+            document.querySelector('button[onclick="startTimer()"]').classList.remove('hidden');
+        }
+
+        function updateBackgroundColor(divisions) {
+            if (divisions === 2) {
+                const halfTime = totalSeconds / 2;
+                if (remainingSeconds > halfTime) {
+                    document.body.style.backgroundColor = 'green';
+                } else {
+                    document.body.style.backgroundColor = 'yellow';
+                }
+            } else if (divisions === 3) {
+                const thirdTime = totalSeconds / 3;
+                if (remainingSeconds > 2 * thirdTime) {
+                    document.body.style.backgroundColor = 'green';
+                } else if (remainingSeconds > thirdTime) {
+                    document.body.style.backgroundColor = 'yellow';
+                } else {
+                    document.body.style.backgroundColor = 'red';
+                }
+            } else if (divisions === 4) {
+                const quarterTime = totalSeconds / 4;
+                if (remainingSeconds > 3 * quarterTime) {
+                    document.body.style.backgroundColor = 'green';
+                } else if (remainingSeconds > 2 * quarterTime) {
+                    document.body.style.backgroundColor = 'yellow';
+                } else if (remainingSeconds > quarterTime) {
+                    document.body.style.backgroundColor = 'blue';
+                } else {
+                    document.body.style.backgroundColor = 'red';
+                }
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            document.getElementById('timerDisplay').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+    </script>
+</body>
+</html>
